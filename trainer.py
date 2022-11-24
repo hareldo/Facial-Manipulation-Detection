@@ -60,7 +60,17 @@ class Trainer:
         print_every = int(len(train_dataloader) / 10)
 
         for batch_idx, (inputs, targets) in enumerate(train_dataloader):
-            """INSERT YOUR CODE HERE."""
+            self.optimizer.zero_grad()
+            pred_probability = self.model(inputs)   # prediction probability is size 2 (real, fake)
+
+            loss = self.criterion(pred_probability, targets)
+            loss.backward()
+            self.optimizer.step()
+            total_loss += loss
+            avg_loss = total_loss / (batch_idx + 1)
+
+            pred = torch.max(pred_probability, dim=1)
+            accuracy = torch.sum(pred.indices == targets) / len(targets)
             if batch_idx % print_every == 0 or \
                     batch_idx == len(train_dataloader) - 1:
                 print(f'Epoch [{self.epoch:03d}] | Loss: {avg_loss:.3f} | '
