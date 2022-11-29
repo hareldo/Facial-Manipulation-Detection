@@ -70,7 +70,9 @@ class Trainer:
             avg_loss = total_loss / (batch_idx + 1)
 
             pred = torch.argmax(pred_probability, dim=1)
-            accuracy = torch.sum(pred == targets) / len(targets)
+            correct_labeled_samples = torch.sum(pred == targets)
+            nof_samples = len(targets)
+            accuracy = correct_labeled_samples / nof_samples * 100
             if batch_idx % print_every == 0 or \
                     batch_idx == len(train_dataloader) - 1:
                 print(f'Epoch [{self.epoch:03d}] | Loss: {avg_loss:.3f} | '
