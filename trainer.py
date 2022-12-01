@@ -40,7 +40,6 @@ class Trainer:
         self.validation_dataset = validation_dataset
         self.test_dataset = test_dataset
         self.epoch = 0
-
     def train_one_epoch(self) -> tuple[float, float]:
         """Train the model for a single epoch on the training dataset.
         Returns:
@@ -104,7 +103,20 @@ class Trainer:
         print_every = max(int(len(dataloader) / 10), 1)
 
         for batch_idx, (inputs, targets) in enumerate(dataloader):
-            """INSERT YOUR CODE HERE."""
+            with torch.no_grad():
+
+                # Prepare for prints
+                pred_probability = self.model(inputs)
+                loss = self.criterion(pred_probability, targets)
+                total_loss += loss
+                avg_loss = total_loss / (batch_idx + 1)
+
+                # Analyze
+                prediction = torch.argmax(pred_probability, dim=1)
+                correct_labeled_samples += torch.sum(prediction == targets)
+                nof_samples += len(targets)
+                accuracy = (correct_labeled_samples / nof_samples) * 100
+
             if batch_idx % print_every == 0 or batch_idx == len(dataloader) - 1:
                 print(f'Epoch [{self.epoch:03d}] | Loss: {avg_loss:.3f} | '
                       f'Acc: {accuracy:.2f}[%] '
