@@ -59,15 +59,18 @@ class Trainer:
         print_every = int(len(train_dataloader) / 10)
 
         for batch_idx, (inputs, targets) in enumerate(train_dataloader):
+            inputs, targets = inputs.to(device), targets.to(device)
+
+            # training steps
             self.optimizer.zero_grad()
             pred_probability = self.model(inputs)   # prediction probability is size 2 (real, fake)
-
             loss = self.criterion(pred_probability, targets)
             loss.backward()
             self.optimizer.step()
             total_loss += loss
             avg_loss = total_loss.item() / (batch_idx + 1)
 
+            # recording step
             pred = torch.argmax(pred_probability, dim=1)
             correct_labeled_samples += torch.sum(pred == targets)
             nof_samples += len(targets)
@@ -104,18 +107,19 @@ class Trainer:
 
         for batch_idx, (inputs, targets) in enumerate(dataloader):
             with torch.no_grad():
+                inputs, targets = inputs.to(device), targets.to(device)
 
                 # Prepare for prints
                 pred_probability = self.model(inputs)
                 loss = self.criterion(pred_probability, targets)
                 total_loss += loss
-                avg_loss = total_loss / (batch_idx + 1)
+                avg_loss = total_loss.item() / (batch_idx + 1)
 
                 # Analyze
                 prediction = torch.argmax(pred_probability, dim=1)
                 correct_labeled_samples += torch.sum(prediction == targets)
                 nof_samples += len(targets)
-                accuracy = (correct_labeled_samples / nof_samples) * 100
+                accuracy = (correct_labeled_samples.item() / nof_samples) * 100
 
             if batch_idx % print_every == 0 or batch_idx == len(dataloader) - 1:
                 print(f'Epoch [{self.epoch:03d}] | Loss: {avg_loss:.3f} | '
