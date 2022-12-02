@@ -8,12 +8,14 @@ import matplotlib.pyplot as plt
 
 from sklearn import metrics
 from torch.utils.data import DataLoader
+from torch.nn.functional import softmax
 
 from common import FIGURES_DIR
 from utils import load_dataset, load_model
 
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+BATCH_SIZE = 32
 
 
 # Arguments
@@ -57,8 +59,21 @@ def get_soft_scores_and_true_labels(dataset, model):
         inference result on the images in the dataset (data in index = 1).
         gt_labels: an iterable holding the samples' ground truth labels.
     """
-    """INSERT YOUR CODE HERE, overrun return."""
-    return torch.rand(100, ), torch.rand(100, ), torch.randint(0, 2, (100, ))
+    dataloader = DataLoader(dataset, BATCH_SIZE, shuffle=False)
+    model.eval()
+
+    all_first_soft_scores, all_second_soft_scores, gt_labels = [], [], []
+
+    with torch.no_grad():
+        for inputs, targets in dataloader:
+            inputs, targets = inputs.to(device), targets.to(device)
+            predictions = model(inputs)
+            soft = softmax(predictions, dim=1)
+            all_first_soft_scores.extend(soft[:, 0].tolist())
+            all_second_soft_scores.extend(soft[:, 1].tolist())
+            gt_labels.extend(targets.tolist())
+
+    return all_first_soft_scores, all_second_soft_scores, gt_labels
 
 
 def plot_roc_curve(roc_curve_figure,

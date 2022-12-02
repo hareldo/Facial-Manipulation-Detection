@@ -40,6 +40,7 @@ class Trainer:
         self.validation_dataset = validation_dataset
         self.test_dataset = test_dataset
         self.epoch = 0
+
     def train_one_epoch(self) -> tuple[float, float]:
         """Train the model for a single epoch on the training dataset.
         Returns:
