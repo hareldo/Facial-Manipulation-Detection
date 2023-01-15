@@ -5,7 +5,7 @@ from torch import nn
 import torchvision.models as models
 
 
-def my_competition_model(model_args,load):
+def my_competition_model():
     """Override the model initialization here.
 
     Do not change the model load line.
@@ -13,7 +13,7 @@ def my_competition_model(model_args,load):
     
 
 
-    model = models.regnet_x_400mf(pretrained=True)
+    model = models.shufflenet_v2_x1_0(pretrained=True)
     model.classifier = nn.Sequential(
         nn.Linear(576, 256),
         nn.ReLU(),
